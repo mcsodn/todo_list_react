@@ -1,7 +1,8 @@
+import Header from "./components/Header";
 function App() {
   return (
     <>
-      <p>Пакет задач</p>
+      <Header />
     </>
   );
 }

@@ -23,3 +23,10 @@ body {
   flex-wrap: nowrap;
   justify-content: center;
 }
+
+@theme {
+  --color-bg-green: #0a5f38;
+  --color-bg-gray: #f2f2f2;
+  --color-sec-gray: #f6f6f6;
+  --color-main-gray: #7e7e7e;
+}
