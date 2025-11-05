@@ -3,7 +3,7 @@ import "./App.css";
 function App() {
   return (
     <>
-      <p>123</p>
+      <p>Пакет задач</p>
     </>
   );
 }
