@@ -1,7 +1,10 @@
-import { useReducer, useState } from "react";
+import { useState } from "react";
+import useLocalStorage from "./hooks/useLocalStorage";
 import Header from "./components/Header";
 import InputTask from "./components/InputTask";
 import TaskList from "./components/TaskList";
+
+const STORAGE_KEY = "tasks";
 
 const initialTasks = [
   { id: 0, text: "Погладь кота", isDone: false },
@@ -10,38 +13,9 @@ const initialTasks = [
   { id: 3, text: "Купи продукты", isDone: true },
 ];
 
-let nextId = 4;
-
-function taskReducer(tasks, action) {
-  switch (action.type) {
-    case "added":
-      return [
-        ...tasks,
-        {
-          id: action.id,
-          text: action.text,
-          isDone: false,
-        },
-      ];
-    case "checked": {
-      const checkedTask = tasks.filter((task) => task.id === action.id)[0];
-      return [
-        ...tasks.filter((task) => task.id !== action.id),
-        { ...checkedTask, isDone: !checkedTask.isDone },
-      ].sort((a, b) => a.id - b.id);
-    }
-    case "deleted":
-      return tasks.filter((task) => task.id !== action.id);
-
-    default: {
-      throw Error("Unknown action: " + action.type);
-    }
-  }
-}
-
 function App() {
+  const [tasks, setTasks] = useLocalStorage(STORAGE_KEY, initialTasks);
   const [inputTaskText, setInputTaskText] = useState("");
-  const [tasks, dispatch] = useReducer(taskReducer, initialTasks);
 
   const checkLength = (e) => {
     setInputTaskText(
@@ -51,28 +25,28 @@ function App() {
 
   const addTask = (text) => {
     if (inputTaskText.length > 0) {
-      dispatch({
-        type: "added",
-        id: nextId++,
+      // Создаём новую задачу
+      const newTask = {
+        id: tasks.length > 0 ? Math.max(...tasks.map((t) => t.id)) + 1 : 0,
         text: text,
         isDone: false,
-      });
+      };
+      // Обновляем массив задач
+      setTasks([...tasks, newTask]);
       setInputTaskText("");
     }
   };
 
   const checkTask = (taskId) => {
-    dispatch({
-      type: "checked",
-      id: taskId,
-    });
+    setTasks(
+      tasks.map((task) =>
+        task.id === taskId ? { ...task, isDone: !task.isDone } : task
+      )
+    );
   };
 
   const deleteTask = (taskId) => {
-    dispatch({
-      type: "deleted",
-      id: taskId,
-    });
+    setTasks(tasks.filter((task) => task.id !== taskId));
   };
 
   return (
